@@ -1,0 +1,1183 @@
+1. npm init
+
+2. Accept all the fefaults
+
+3. you will have created a package.json file and it will look like this:
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+4. 5. Install nodemon, express, body-parser, cookie-parser, compression, helmet, cors
+
+5. Your package.json file should now look like this:
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^4.6.0",
+    "nodemon": "^2.0.12"
+  }
+}
+
+And you should now have a node_modules folder inside the root directory
+
+
+6. Create a folder in the forrt directory called 'server'
+
+7. Inside 'server' create a file called express.js
+import express from 'express'
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+
+const app = express();
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended= true }))
+
+app.use(cookieParser())
+app.use(compression())
+app.use(helmet())
+app.use(cors());
+
+
+export default app;
+
+
+8. Create a file called server.js inside the 'server' folder
+
+9. Inside server.js
+
+import app from "./express";
+
+const PORT = 3000;
+
+app.listen(PORT, (err) => {
+    if(err){
+        console.log(err);
+    }else{
+        console.log(`Server running on port : ${PORT}`);
+    }
+})
+
+
+10. Create your webpack files:
+a. webpack.config.client.js
+b. webpack.config.client.production.js
+c. webpack.config.server.js
+
+
+
+11. Inside webpack.config.client.js:
+const path = require('path')
+const webpack = require('webpack')
+const CURRENT_WORKING_DIR = process.cwd()
+
+const config = {
+    name: "browser",
+    mode: "development",
+    devtool: 'eval-source-map',
+    entry: [
+        'webpack-hot-middleware/client?reload=true',
+        path.join(CURRENT_WORKING_DIR, 'client/main.js')
+    ],
+    output: {
+        path: path.join(CURRENT_WORKING_DIR , '/dist'),
+        filename: 'bundle.js',
+        publicPath: '/dist/'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
+                use: [
+                    'babel-loader'
+                ]
+            },
+            {
+                test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
+                use: 'file-loader'
+            }
+        ]
+    },  
+    plugins: [
+          new webpack.HotModuleReplacementPlugin(),
+          new webpack.NoEmitOnErrorsPlugin()
+    ],
+    resolve: {
+        alias: {
+          'react-dom': '@hot-loader/react-dom'
+        }
+    }
+}
+
+module.exports = config
+
+
+
+12. Inside webpack.config.client.production.js:
+const path = require('path')
+const CURRENT_WORKING_DIR = process.cwd()
+
+const config = {
+    mode: "production",
+    entry: [
+        path.join(CURRENT_WORKING_DIR, 'client/main.js')
+    ],
+    output: {
+        path: path.join(CURRENT_WORKING_DIR , '/dist'),
+        filename: 'bundle.js',
+        publicPath: "/dist/"
+    },
+    module: {
+        rules: [
+            {
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
+                use: [
+                    'babel-loader'
+                ]
+            },
+            {
+                test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
+                use: 'file-loader'
+            }
+        ]
+    }
+}
+
+module.exports = config
+
+
+
+13. Inside webpack.config.server.js:
+const path = require('path')
+const nodeExternals = require('webpack-node-externals')
+const CURRENT_WORKING_DIR = process.cwd()
+
+const config = {
+    name: "server",
+    entry: [ path.join(CURRENT_WORKING_DIR , './server/server.js') ],
+    target: "node",
+    output: {
+        path: path.join(CURRENT_WORKING_DIR , '/dist/'),
+        filename: "server.generated.js",
+        publicPath: '/dist/',
+        libraryTarget: "commonjs2"
+    },
+    externals: [nodeExternals()],
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: [ 'babel-loader' ]
+            },
+            {
+                test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
+                use: 'file-loader'
+            }
+        ]
+    }
+}
+
+module.exports = config
+
+
+14. Create a file called .babelrc and add:
+{
+    "presets": [
+      ["@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
+      "@babel/preset-react"
+    ],
+    "plugins": [
+      "react-hot-loader/babel"
+    ]
+}
+
+
+15. Run the command:
+npm install --save-dev babel-core babel-loader babel-preset-env babel-preset-stage-2
+
+
+16. Your package.json file should now look like this:
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^4.6.0",
+    "nodemon": "^2.0.12"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.2.2",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1"
+  }
+}
+
+
+17. In package.json, in devDependencies, add:
+"babel-preset-react": "^6.24.1",
+
+18. Run npm install in root directory
+
+
+19. Now add the following dependencies in devDependencies in package.json:
+"devDependencies": {
+"babel-core": "^6.26.2",
+"babel-loader": "^7.1.4",
+"babel-preset-env": "^1.6.1",
+"babel-preset-react": "^6.24.1",
+"babel-preset-stage-2": "^6.24.1",
+"nodemon": "^1.17.3",
+"webpack": "^4.6.0",
+"webpack-cli": "^2.0.15",
+"webpack-dev-middleware": "^3.1.2",
+"webpack-hot-middleware": "^2.22.1",
+"webpack-node-externals": "^1.7.2"
+}
+
+
+20. Now run npm install in the root directory
+
+
+21. Add the following dependencies to package.json
+"mongodb": "^3.0.7",
+"react": "^16.3.2",
+"react-dom": "^16.3.2",
+"react-hot-loader": "^4.1.2"
+
+
+22. Run npm install
+
+23. Create a nodemon.json file and add:
+{
+    "verbose": false,
+    "watch": [
+      "./server"
+    ],
+    "exec": "webpack --mode=development --config webpack.config.server.js && node ./dist/server.generated.js"
+}
+
+
+24. Create a template.js file and add:
+export default ({markup, css}) => {
+    return `<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta
+            name="viewport"
+            content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
+          >
+          <title>MERN Skeleton</title>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400">
+          <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+          <style>
+              a{
+                text-decoration: none;
+                color: #061d95
+              }
+          </style>
+        </head>
+        <body style="margin:0">
+          <div id="root">${markup}</div>
+          <style id="jss-server-side">${css}</style>
+          <script type="text/javascript" src="/dist/bundle.js"></script>
+        </body>
+      </html>`
+}
+
+
+
+
+
+25. modify package.json:
+"scripts": {
+    "development": "nodemon",
+    "build": "webpack --config webpack.config.client.production.js && webpack --mode=production --config webpack.config.server.js",
+    "start": "NODE_ENV=production node ./dist/server.generated.js"
+  },
+  "engines": {
+    "node": "13.12.0",
+    "npm": "6.14.4"
+  },
+  "devDependencies": {
+    "@babel/core": "7.9.0",
+    "@babel/preset-env": "7.9.0",
+    "@babel/preset-react": "7.9.4",
+    "babel-loader": "8.1.0",
+    "file-loader": "6.0.0",
+    "nodemon": "2.0.2",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11",
+    "webpack-dev-middleware": "3.7.2",
+    "webpack-hot-middleware": "2.25.0",
+    "webpack-node-externals": "1.7.2"
+  },
+  "dependencies": {
+    "@hot-loader/react-dom": "16.13.0",
+    "@material-ui/core": "4.9.8",
+    "@material-ui/icons": "4.9.1",
+    "body-parser": "1.19.0",
+    "compression": "1.7.4",
+    "cookie-parser": "1.4.5",
+    "cors": "2.8.5",
+    "express": "4.17.1",
+    "express-jwt": "5.3.1",
+    "helmet": "3.22.0",
+    "jsonwebtoken": "8.5.1",
+    "lodash": "4.17.15",
+    "mongoose": "5.9.7",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-hot-loader": "4.12.20",
+    "react-router": "5.1.2",
+    "react-router-dom": "5.1.2"
+  }
+
+
+
+
+  26. Run npm install
+
+
+  27. Create folder 'dist'
+
+  28. Create file called:
+  'server.generated.js'
+
+  29. Add the contents from C:\Adam\mern-skeleton\dist
+
+30. Create config folder and create 'config.js' and add:
+const config = {
+  env: process.env.NODE_ENV || 'development',
+  port: process.env.PORT || 3000,
+  jwtSecret: process.env.JWT_SECRET || "YOUR_secret_key",
+  mongoUri: process.env.MONGODB_URI ||
+    process.env.MONGO_HOST ||
+    'mongodb://' + (process.env.IP || 'localhost') + ':' +
+    (process.env.MONGO_PORT || '27017') +
+    '/mernproject'
+}
+
+export default config
+
+
+
+31. Modify server.js:
+import config from './../config/config'
+import app from './express'
+app.listen(config.port, (err) => {
+if (err) {
+console.log(err)
+}
+console.info('Server started on port %s.', config.port)
+})
+
+
+
+32. Run npm run development
+
+
+33. Run npm install mongoose --save, if you don't already have the dependency, which at this point I do. But this would be critical to double check
+
+34. Modify server.js:
+import mongoose from 'mongoose'
+mongoose.Promise = global.Promise
+mongoose.connect(config.mongoUri)
+mongoose.connection.on('error', () => {
+throw new Error(`unable to connect to database: ${mongoUri}`)
+})
+
+
+
+35. Modify template.js:
+export default () => {
+  return `<!doctype html>
+  <html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <title>MERN Skeleton</title>
+  </head>
+  <body>
+  <div id="root">Hello World</div>
+  </body>
+  </html>`
+  }
+
+  36. Modify express.js:
+  import express from 'express'
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import Template from './../template'
+
+const app = express();
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(cookieParser())
+app.use(compression())
+app.use(helmet())
+app.use(cors());
+
+app.get('/', (req, res) => {
+    res.status(200).send(Template())
+})
+
+
+export default app;
+
+
+37. If your server has stopped, run npm run development. Otheriwse you should be able to view localhost:3000 in your browser. Maybe hit refresh if necessary.
+A simple 'Hello World' <p></p> tag will be visible
+
+
+
+38. Herein we create the User model. Inside the 'server' folder create a new folder called 'models' and create the file 'user.model.js' and add:
+import mongoose from 'mongoose'
+const UserSchema = new mongoose.Schema({  })
+
+39. Update the user.model.js file:
+import mongoose from "mongoose";
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    }
+})
+
+
+40. Modify the user.model.js:
+import mongoose from "mongoose";
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    },
+    email: {
+        type: String,
+        trim: true,
+        unique: 'Email already exists',
+        match:  [/.+\@.+\..+/, 'Please fill a valid email address'],
+        required: 'Email is required'
+    }
+})
+
+
+41. Modify the user.model.js file:
+
+import mongoose from "mongoose";
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    },
+    email: {
+        type: String,
+        trim: true,
+        unique: 'Email already exists',
+        match:  [/.+\@.+\..+/, 'Please fill a valid email address'],
+        required: 'Email is required'
+    },
+    updated: Date,
+    created: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+
+42. Modify user.model.js:
+
+import mongoose from "mongoose";
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    },
+    email: {
+        type: String,
+        trim: true,
+        unique: 'Email already exists',
+        match:  [/.+\@.+\..+/, 'Please fill a valid email address'],
+        required: 'Email is required'
+    },
+    hashed_password: {
+        type: String,
+        required: 'Password is required'
+    },
+    salt: String,
+    updated: Date,
+    created: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+
+
+
+43. Virtual fields:
+The password string provided by the user is not stored directly in the user
+document. Instead, it is handled as a virtual field.
+
+Inside user.models.js:
+
+import mongoose from "mongoose";
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    },
+    email: {
+        type: String,
+        trim: true,
+        unique: 'Email already exists',
+        match:  [/.+\@.+\..+/, 'Please fill a valid email address'],
+        required: 'Email is required'
+    },
+    hashed_password: {
+        type: String,
+        required: 'Password is required'
+    },
+    salt: String,
+    updated: Date,
+    created: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+UserSchema.virtual('password').set(function(password) {
+    this._password = password
+    this.salt = this.makeSalt()
+    this.hashed_password = this.encryptPassword(password)
+}).get(function() {
+    return this._password
+})
+
+
+
+44. Create three methods: authenticate, encryptPassword and makeSalt:
+
+import mongoose from "mongoose";
+import crypto from 'crypto'
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    },
+    email: {
+        type: String,
+        trim: true,
+        unique: 'Email already exists',
+        match:  [/.+\@.+\..+/, 'Please fill a valid email address'],
+        required: 'Email is required'
+    },
+    hashed_password: {
+        type: String,
+        required: 'Password is required'
+    },
+    salt: String,
+    updated: Date,
+    created: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+UserSchema.virtual('password').set(function(password) {
+    this._password = password
+    this.salt = this.makeSalt()
+    this.hashed_password = this.encryptPassword(password)
+}).get(function() {
+    return this._password
+})
+
+UserSchema.methods = {
+    authenticate: function(plainText){
+        return this.encryptPassword(plainText) === this.hashed_password
+    },
+    encryptPassword: function(password) {
+        if(!password) return ''
+        try{
+            return crypto.createHmac('sha1', this.salt).update(password).digest('hex')
+        }catch(err){
+            return ''
+        }
+    },
+    makeSalt: function(){
+        return Math.round((new Date().valueOf() * Math.random() )) + ''
+    }
+}
+
+export default mongoose.model('User', UserSchema)
+
+
+45. And now, to validate the password:
+Inside, usermodels.js:
+
+import mongoose from "mongoose";
+import crypto from 'crypto'
+
+const UserSchema = new mongoose.Schema({ 
+    name: {
+        type: String,
+        trim: true,
+        required: 'Name is required'
+    },
+    email: {
+        type: String,
+        trim: true,
+        unique: 'Email already exists',
+        match:  [/.+\@.+\..+/, 'Please fill a valid email address'],
+        required: 'Email is required'
+    },
+    hashed_password: {
+        type: String,
+        required: 'Password is required'
+    },
+    salt: String,
+    updated: Date,
+    created: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+UserSchema.virtual('password').set(function(password) {
+    this._password = password
+    this.salt = this.makeSalt()
+    this.hashed_password = this.encryptPassword(password)
+}).get(function() {
+    return this._password
+})
+
+UserSchema.path('hashed_password').validate(function(v) {
+    if(this._password && this._password.length < 6){
+        this.invalidate('password', 'Password must be at least 6 characters.')
+    }
+    if(this.isNew && !this._password){
+        this.invalidate('password', 'Password is required')
+    }
+}, null)
+
+UserSchema.methods = {
+    authenticate: function(plainText){
+        return this.encryptPassword(plainText) === this.hashed_password
+    },
+    encryptPassword: function(password) {
+        if(!password) return ''
+        try{
+            return crypto.createHmac('sha1', this.salt).update(password).digest('hex')
+        }catch(err){
+            return ''
+        }
+    },
+    makeSalt: function(){
+        return Math.round((new Date().valueOf() * Math.random() )) + ''
+    }
+}
+
+export default mongoose.model('User', UserSchema)
+
+
+
+46. Create a new folder inside the 'server' folder called 'helpers' and create a file called
+'dbErrorHandler.js' and add:
+const getErrorMessage = (err) => {
+    let message = '';
+    if(err.code){
+        switch(err.code){
+            case 11000:
+            case 11001:
+                message = getUniqueError(err)
+                break
+            default:
+                message = 'Something went wrong'
+        }
+    }else{
+        for(let errName in err.errors){
+            if(err.errors[errName].message)
+            message= err.errors[errName].message
+        }
+    }
+    return message
+}
+export default (getErrorMessage)
+
+
+47. Modify dbErrorHandler.js:
+
+'use-strict'
+
+const getUniqueErrorMessage = (err) => {
+    let output
+    try{
+        let fieldName = err.message.substring(err.message.lastIndexOf('.$') + 2, err.message.lastIndexOf('_1') )
+        output = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' already exists'
+    }catch(ex){
+        output = 'Unique field aldready exists'
+    }
+    return output
+}
+
+const getErrorMessage = (err) => {
+    let message = '';
+    if(err.code){
+        switch(err.code){
+            case 11000:
+            case 11001:
+                message = getUniqueErrorMessage(err)
+                break
+            default:
+                message = 'Something went wrong'
+        }
+    }else{
+        for(let errName in err.errors){
+            if(err.errors[errName].message)
+            message= err.errors[errName].message
+        }
+    }
+    return message
+}
+export default (getErrorMessage)
+
+
+48. Create a new folder inside 'server' called 'routes' and create a file called 'user.routes.js'
+
+49. Modify express.js:
+import express from 'express'
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import Template from './../template'
+import userRoutes from './routes/user.routes'
+
+const app = express();
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(cookieParser())
+app.use(compression())
+app.use(helmet())
+app.use(cors());
+
+//mount routes
+app.use('/', userRoutes);
+
+app.get('/', (req, res) => {
+    res.status(200).send(Template())
+})
+
+
+export default app;
+
+
+The nodemon may crash at this point, but we are going to continue. The error message is:
+C:\Users\Adam\mern\backend\node_modules\express\lib\router\index.js:458
+      throw new TypeError('Router.use() requires a middleware function but got a ' + gettype(fn))
+      ^
+
+TypeError: Router.use() requires a middleware function but got a Object
+    at Function.use (C:\Users\Adam\mern\backend\node_modules\express\lib\router\index.js:458:13)
+    at Function.<anonymous> (C:\Users\Adam\mern\backend\node_modules\express\lib\application.js:220:21)
+    at Array.forEach (<anonymous>)
+    at Function.use (C:\Users\Adam\mern\backend\node_modules\express\lib\application.js:217:7)
+    at Module.eval (webpack:///./server/express.js?:44:5)
+    at eval (webpack:///./server/express.js?:69:30)
+    at Module../server/express.js (C:\Users\Adam\mern\backend\dist\server.generated.js:121:1)
+    at __webpack_require__ (C:\Users\Adam\mern\backend\dist\server.generated.js:21:30)
+    at Module.eval (webpack:///./server/server.js?:3:69)
+    at eval (webpack:///./server/server.js?:49:30)
+[nodemon] app crashed - waiting for file changes before starting...
+
+
+
+50. Herein where we develop the controllers. In the 'server' folder, create a new folder called 'controllers' and create two new
+files:
+auth.controller.js
+user.controller.js
+
+
+51. Inside user.controller.js, add:
+import User from '../models/user.model'
+import extend from 'lodash/extend'
+import errorHandler from './../helpers/dbErrorHandler'
+
+const create = async (req, res) => {
+  const user = new User(req.body)
+  try {
+    await user.save()
+    return res.status(200).json({
+      message: "Successfully signed up!"
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err)
+    })
+  }
+}
+
+/**
+ * Load user and append to req.
+ */
+const userByID = async (req, res, next, id) => {
+  try {
+    let user = await User.findById(id)
+    if (!user)
+      return res.status('400').json({
+        error: "User not found"
+      })
+    req.profile = user
+    next()
+  } catch (err) {
+    return res.status('400').json({
+      error: "Could not retrieve user"
+    })
+  }
+}
+
+const read = (req, res) => {
+  req.profile.hashed_password = undefined
+  req.profile.salt = undefined
+  return res.json(req.profile)
+}
+
+const list = async (req, res) => {
+  try {
+    let users = await User.find().select('name email updated created')
+    res.json(users)
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err)
+    })
+  }
+}
+
+const update = async (req, res) => {
+  try {
+    let user = req.profile
+    user = extend(user, req.body)
+    user.updated = Date.now()
+    await user.save()
+    user.hashed_password = undefined
+    user.salt = undefined
+    res.json(user)
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err)
+    })
+  }
+}
+
+const remove = async (req, res) => {
+  try {
+    let user = req.profile
+    let deletedUser = await user.remove()
+    deletedUser.hashed_password = undefined
+    deletedUser.salt = undefined
+    res.json(deletedUser)
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err)
+    })
+  }
+}
+
+export default {
+  create,
+  userByID,
+  read,
+  list,
+  remove,
+  update
+}
+
+
+
+
+52. Run command npm install lodash
+
+53. Inside 'auth.controller.js', add:
+
+import User from '../models/user.model'
+import jwt from 'jsonwebtoken'
+import expressJwt from 'express-jwt'
+import config from './../../config/config'
+
+const signin = async (req, res) => {
+  try {
+    let user = await User.findOne({
+      "email": req.body.email
+    })
+    if (!user)
+      return res.status('401').json({
+        error: "User not found"
+      })
+
+    if (!user.authenticate(req.body.password)) {
+      return res.status('401').send({
+        error: "Email and password don't match."
+      })
+    }
+
+    const token = jwt.sign({
+      _id: user._id
+    }, config.jwtSecret)
+
+    res.cookie("t", token, {
+      expire: new Date() + 9999
+    })
+
+    return res.json({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    })
+
+  } catch (err) {
+
+    return res.status('401').json({
+      error: "Could not sign in"
+    })
+
+  }
+}
+
+const signout = (req, res) => {
+  res.clearCookie("t")
+  return res.status('200').json({
+    message: "signed out"
+  })
+}
+
+const requireSignin = expressJwt({
+  secret: config.jwtSecret,
+  userProperty: 'auth'
+})
+
+const hasAuthorization = (req, res, next) => {
+  const authorized = req.profile && req.auth && req.profile._id == req.auth._id
+  if (!(authorized)) {
+    return res.status('403').json({
+      error: "User is not authorized"
+    })
+  }
+  next()
+}
+
+export default {
+  signin,
+  signout,
+  requireSignin,
+  hasAuthorization
+}
+
+
+54. Inside 'user.routes.js, add:
+import express from 'express'
+import userCtrl from '../controllers/user.controller'
+import authCtrl from '../controllers/auth.controller'
+
+const router = express.Router()
+
+router.route('/api/users').get(userCtrl.list).post(userCtrl.create)
+
+router.route('/api/users/:userID')
+    .get(authCtrl.requireSignin, userCtrl.read)
+    .put(authCtrl.requireSignin, authCtrl.hasAuthorization, userCtrl.update)
+    .delete(authCtrl.requireSignin, authCtrl.hasAuthorization, userCtrl.remove)
+
+router.param('userId', userCtrl.userByID)
+
+export default router
+
+
+55. In express.js, modify:
+import express from 'express'
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import Template from './../template'
+
+import userRoutes from './routes/user.routes'
+import authRoutes from './routes/auth.routes'
+
+const app = express();
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(cookieParser())
+app.use(compression())
+app.use(helmet())
+app.use(cors());
+
+//mount routes
+app.use('/', userRoutes);
+app.use('/', authRoutes)
+
+app.get('/', (req, res) => {
+    res.status(200).send(Template())
+})
+
+
+export default app;
+
+
+56. Inside routes folder, create new file, 'auth.routes.js' and add:
+import express from 'express'
+import authCtrl from '../controllers/auth.controller'
+
+const router = express.Router()
+
+router.route('/auth/signin')
+  .post(authCtrl.signin)
+router.route('/auth/signout')
+  .get(authCtrl.signout)
+
+export default router
+
+
+57. Inside express.js:
+Modify, near the end of the code, write:
+
+import express from 'express'
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import Template from './../template'
+
+import userRoutes from './routes/user.routes'
+import authRoutes from './routes/auth.routes'
+
+const app = express();
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(cookieParser())
+app.use(compression())
+app.use(helmet())
+app.use(cors());
+
+//mount routes
+app.use('/', userRoutes);
+app.use('/', authRoutes)
+
+app.get('/', (req, res) => {
+    res.status(200).send(Template())
+})
+
+
+//catch unauthorized users errors
+app.use((err, req, res, next) => {
+    if (err.name === 'UnauthorizedError') {
+      res.status(401).json({"error" : err.name + ": " + err.message})
+    }else if (err) {
+      res.status(400).json({"error" : err.name + ": " + err.message})
+      console.log(err)
+    }
+  })
+
+
+export default app;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
